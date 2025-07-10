@@ -11,8 +11,9 @@ from screens import (
     show_drivers,
     driver_dashboard,
     register_user,
-    register_drivers,
+    driver_route_selection,  # ✅ new import
 )
+from logic import load_drivers  # ✅ for checking if driver exists
 
 # Background image setup
 def set_background(image_path):
@@ -73,11 +74,11 @@ def main():
     elif st.session_state.page == 'route_selection':
         route_selection.show()
 
+    elif st.session_state.page == 'driver_route_selection':
+        driver_route_selection.show()
+
     elif st.session_state.page == 'show_drivers':
         show_drivers.show()
-
-    elif st.session_state.page == 'register_driver':
-        register_drivers.show()
 
     elif st.session_state.page == 'driver_dashboard':
         driver_dashboard.show()
