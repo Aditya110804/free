@@ -4,18 +4,20 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from logic import load_drivers, load_bookings, update_driver_route
 
-def driver_dashboard():
+def show():
     st.header("🚗 Driver Dashboard")
     username = st.session_state.get("username")
 
     # Load driver profile
     drivers = load_drivers()
-    driver = next((d for d in drivers if d["username"] == username), None)
+    driver = next((d for d in drivers if d.get("username") == username), None)
     if not driver:
-        st.error("Driver profile not found. Please register again.")
-        st.session_state.page = "register"
+        st.error("something went wrong. Please try logging in again.")
+        st.session_state.page = "login"
         st.rerun()
-        return
+    return
+    
+    driver = next((d for d in drivers if d.get("username") == username),none)
 
     ## 1) Show static profile info
     st.subheader("👤 Your Profile")
@@ -53,7 +55,7 @@ def driver_dashboard():
 
     st.markdown("---")
 
-    ## 3) Show bookings
+    # Show bookings
     st.subheader("📋 Your Bookings")
     bookings = load_bookings()
     your = [b for b in bookings if b["driver"]["username"] == username]
