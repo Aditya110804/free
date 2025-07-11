@@ -1,4 +1,4 @@
-AttributeError: module 'screens.driver_dashboard' has no attribute 'show'
+KeyError: 'username'
 
 File "C:\Users\ADITYA\Desktop\CAR POOLING\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 128, in exec_func_with_error_handling
     result = func()
@@ -10,4 +10,9 @@ File "C:\Users\ADITYA\Desktop\CAR POOLING\app.py", line 131, in <module>
     main()
 File "C:\Users\ADITYA\Desktop\CAR POOLING\app.py", line 84, in main
     driver_dashboard.show()
-    ^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\ADITYA\Desktop\CAR POOLING\screens\driver_dashboard.py", line 13, in show
+    driver = next((d for d in drivers if d["username"] == username), None)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\ADITYA\Desktop\CAR POOLING\screens\driver_dashboard.py", line 13, in <genexpr>
+    driver = next((d for d in drivers if d["username"] == username), None)
+                                         ~^^^^^^^^^^^^
