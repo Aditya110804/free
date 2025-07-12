@@ -2,7 +2,7 @@ import streamlit as st
 
 def render_navbar():
     if "username" not in st.session_state or "role" not in st.session_state:
-        return  # don't show navbar if user not logged in
+        return
 
     username = st.session_state.get("username", "")
     role = st.session_state.get("role", "")
@@ -44,7 +44,7 @@ def render_navbar():
     </div>
     """.format(username=username, role=role.capitalize()), unsafe_allow_html=True)
 
-    # Handle manual route switch
+    # Route based on link clicked
     query_params = st.experimental_get_query_params()
     if "nav" in query_params:
         nav_target = query_params["nav"][0]
@@ -53,9 +53,9 @@ def render_navbar():
             st.session_state.page = "home"
             st.session_state.username = None
             st.session_state.role = None
-            st.experimental_set_query_params()  # clear
+            st.experimental_set_query_params()
             st.rerun()
         elif nav_target == "profile":
             st.session_state.page = "profile"
-            st.experimental_set_query_params()  # clear
+            st.experimental_set_query_params()
             st.rerun()
