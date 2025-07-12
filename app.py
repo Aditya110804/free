@@ -11,9 +11,12 @@ from screens import (
     show_drivers,
     driver_dashboard,
     register_user,
-    driver_route_selection,  # ✅ new import
+    register_drivers,
+    driver_route_selection,
+    profile  # ✅ new import
 )
-from logic import load_drivers  # ✅ for checking if driver exists
+from logic import load_drivers
+from navbar import render_navbar
 
 # Background image setup
 def set_background(image_path):
@@ -49,7 +52,6 @@ st.set_page_config(
 )
 
 def main():
-    # Session state init
     if 'page' not in st.session_state:
         st.session_state.page = 'home'
     if 'logged_in' not in st.session_state:
@@ -61,29 +63,31 @@ def main():
     if 'route_info' not in st.session_state:
         st.session_state.route_info = None
 
-    # Navigation logic
+    # Render navbar if logged in
+    if st.session_state.logged_in:
+        render_navbar()
+
+    # Page routing
     if st.session_state.page == 'home':
         home.show()
-
     elif st.session_state.page == 'login':
         login.show()
-
     elif st.session_state.page == 'register_user':
         register_user.show()
-
+    elif st.session_state.page == 'register_driver':
+        register_drivers.show()
     elif st.session_state.page == 'route_selection':
         route_selection.show()
-
     elif st.session_state.page == 'driver_route_selection':
         driver_route_selection.show()
-
     elif st.session_state.page == 'show_drivers':
         show_drivers.show()
-
     elif st.session_state.page == 'driver_dashboard':
         driver_dashboard.show()
+    elif st.session_state.page == 'profile':
+        profile.show()
 
-    # Logout logic
+    # Logout in sidebar (optional backup)
     if st.session_state.logged_in:
         if st.sidebar.button("Logout"):
             st.session_state.logged_in = False
