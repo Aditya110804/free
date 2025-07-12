@@ -1,7 +1,7 @@
 import streamlit as st
 import sys, os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '')))
 from logic import load_drivers, load_passengers
 
 def show():
