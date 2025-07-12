@@ -1,51 +1,50 @@
 import streamlit as st
 import sys, os
-from datetime import datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from logic import update_driver_route, load_drivers
+from logic import save_driver
 
 def show():
-    st.header("🚗 Driver Route Setup")
+    st.header("🚗 Driver Profile Setup")
 
     username = st.session_state.get("username")
     if not username:
-        st.warning("Please log in as a driver.")
+        st.warning("Please log in or register first.")
         st.session_state.page = "login"
         st.rerun()
         return
 
-    # Load driver profile (only for confirmation, not editing here)
-    drivers = load_drivers()
-    driver = next((d for d in drivers if d.get("username") == username), None)
+    with st.form("driver_profile_form"):
+        name = st.text_input("Full Name *")
+        age = st.number_input("Age *", min_value=18, max_value=100)
+        gender = st.selectbox("Gender *", ["Male", "Female", "Other"])
+        contact = st.text_input("Contact Number *")
+        vehicle_no = st.text_input("Vehicle Number *")
+        driver_id = st.text_input("Driver ID *")
+        national_id = st.text_input("National ID / Aadhaar *")
 
-    with st.form("driver_route_form"):
-        from_location = st.text_input("From Location *")
-        to_location = st.text_input("To Location *")
-        avail_date = st.date_input("Available Date *", value=datetime.today())
-        avail_time = st.time_input("Available Time *", value=datetime.now().time())
-
-        submitted = st.form_submit_button("Save Route")
+        submitted = st.form_submit_button("Save Profile")
 
         if submitted:
-            required_fields = [from_location, to_location]
+            required_fields = [name, contact, vehicle_no, driver_id, national_id]
             if any(not str(field).strip() for field in required_fields):
-                st.error("Please fill all required fields marked with *.")
+                st.error("Please fill in all required fields.")
             else:
-                new_route = {
-                    "from": from_location.strip(),
-                    "to": to_location.strip(),
-                    "date": str(avail_date),
-                    "time": avail_time.strftime("%H:%M:%S")
+                driver_data = {
+                    "username": username,
+                    "name": name.strip(),
+                    "age": int(age),
+                    "gender": gender,
+                    "contact": contact.strip(),
+                    "vehicle_no": vehicle_no.strip(),
+                    "driver_id": driver_id.strip(),
+                    "national_id": national_id.strip()
                 }
-                if update_driver_route(username, new_route):
-                    st.success("Driver route updated successfully!")
-                    st.session_state.route_info = new_route
-                    st.session_state.page = "driver_dashboard"
-                    st.rerun()
-                else:
-                    st.error("Failed to update route. Please try again.")
+                save_driver(driver_data)
+                st.success("Driver profile saved successfully!")
+                st.session_state.page = "driver_route_selection"
+                st.rerun()
 
-    if st.button("Back to Home"):
+    if st.button("🏠 Back to Home"):
         st.session_state.page = "home"
         st.rerun()
