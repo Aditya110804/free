@@ -1,3 +1,5 @@
+# ✅ driver_route_selection.py
+
 import streamlit as st
 import sys, os
 from datetime import datetime
@@ -8,14 +10,14 @@ from logic import update_driver_route, load_drivers
 def show():
     st.header("🚗 Driver Route Setup")
 
-    username = st.session_state["username"]
+    username = st.session_state.get("username")
     if not username:
         st.warning("Please log in as a driver.")
         st.session_state.page = "login"
         st.rerun()
         return
 
-    # Load existing driver info to pre-fill form if available
+    # Load existing driver info
     drivers = load_drivers()
     driver = next((d for d in drivers if d.get("username") == username or d.get("driver_id") == username), None)
 
@@ -33,6 +35,7 @@ def show():
                 st.error("Please fill all required fields marked with *.")
             else:
                 new_route = {
+                    "username": username,  # ✅ Added username
                     "from": from_location.strip(),
                     "to": to_location.strip(),
                     "date": str(avail_date),
