@@ -1,7 +1,7 @@
 import os
 import json
 
-# File paths for storing data
+# File paths
 PASSENGERS_JSON = "data/passengers.json"
 DRIVERS_JSON = "data/drivers.json"
 BOOKINGS_JSON = "data/bookings.json"
@@ -13,11 +13,9 @@ def load_json(filepath):
             with open(filepath, "r") as f:
                 content = f.read().strip()
                 if not content:
-                    # Empty file, return empty list
                     return []
                 return json.loads(content)
         except json.JSONDecodeError:
-            # Invalid JSON, treat as empty list
             return []
     return []
 
@@ -26,27 +24,34 @@ def save_json(filepath, data):
     with open(filepath, "w") as f:
         json.dump(data, f, indent=4)
 
-# Passenger functions
+# Loaders
 def load_passengers():
     return load_json(PASSENGERS_JSON)
 
+def load_drivers():
+    return load_json(DRIVERS_JSON)
+
+def load_bookings():
+    return load_json(BOOKINGS_JSON)
+
+def load_users():
+    return load_json(USERS_JSON)
+
+# Savers
 def save_passenger(passenger_data):
     passengers = load_passengers()
     passengers.append(passenger_data)
     save_json(PASSENGERS_JSON, passengers)
-
-# Driver functions
-def load_drivers():
-    return load_json(DRIVERS_JSON)
 
 def save_driver(driver_data):
     drivers = load_drivers()
     drivers.append(driver_data)
     save_json(DRIVERS_JSON, drivers)
 
-# User functions (for authentication)
-def load_users():
-    return load_json(USERS_JSON)
+def save_booking(booking_data):
+    bookings = load_bookings()
+    bookings.append(booking_data)
+    save_json(BOOKINGS_JSON, bookings)
 
 def save_user(user_data):
     users = load_users()
@@ -57,7 +62,7 @@ def username_exists(username):
     users = load_users()
     return any(user["username"] == username for user in users)
 
-# Find matching drivers for a passenger's route (from, to, date)
+# Matching driver with passenger route
 def find_matches(route_info):
     drivers = load_drivers()
     matches = [
@@ -68,33 +73,18 @@ def find_matches(route_info):
     ]
     return matches
 
-# Booking functions
-def load_bookings():
-    return load_json(BOOKINGS_JSON)
-
-def save_booking(booking_data):
-    bookings = load_bookings()
-    bookings.append(booking_data)
-    save_json(BOOKINGS_JSON, bookings)
-
-# logic.py (add at bottom)
-
+# Update driver's route
 def update_driver_route(username, new_route):
-    """
-    Update only route details for a driver identified by username.
-    new_route should be a dict with keys: from, to, date, time.
-    """
     drivers = load_drivers()
     updated = False
     for d in drivers:
-        if d["username"] == username:
-            # update only the route fields
+        if d.get("username") == username:
             d["from"] = new_route["from"]
-            d["to"]   = new_route["to"]
+            d["to"] = new_route["to"]
             d["date"] = new_route["date"]
             d["time"] = new_route["time"]
             updated = True
             break
-            if updated:
-                save_json(DRIVERS_JSON, drivers)
-            return updated
+    if updated:
+        save_json(DRIVERS_JSON, drivers)
+    return updated
