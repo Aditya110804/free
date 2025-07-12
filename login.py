@@ -1,3 +1,4 @@
+
 import streamlit as st
 import sys, os
 
@@ -32,6 +33,11 @@ def show():
 
                 if role == "passenger":
                     st.session_state.page = "route_selection"
+                elif role == "driver":
+                    st.session_state.page = "driver_route_selection"
+                    # Check if driver has already registered a route
+                    if st.session_state.get("route_info"):
+                        st.session_state.page = "driver_dashboard"
                 else:
                     # Check if driver already registered route
                     drivers = load_drivers()
