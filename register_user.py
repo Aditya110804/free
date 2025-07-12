@@ -32,9 +32,9 @@ def show():
                 st.session_state.role = role
                 st.session_state.logged_in = True
 
-                # Redirect to role-specific profile
+                # Redirect to role-specific setup
                 if role == "driver":
-                    st.session_state.page = "register_driver"  # go fill driver profile
+                    st.session_state.page = "register_driver"
                 else:
                     st.session_state.page = "route_selection"
                 st.rerun()
@@ -45,6 +45,6 @@ def show():
             st.session_state.page = "login"
             st.rerun()
     with col2:
-        if st.button("🔙 Back to Home"):
+        if st.button("🏠 Back to Home"):
             st.session_state.page = "home"
             st.rerun()
