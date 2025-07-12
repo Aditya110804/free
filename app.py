@@ -13,10 +13,10 @@ from screens import (
     register_user,
     register_drivers,
     driver_route_selection,
-    profile  # ✅ new import
+    profile  # ✅ new screen
 )
 from logic import load_drivers
-from navbar import render_navbar
+from navbar import render_navbar  # ✅ reusable navbar
 
 # Background image setup
 def set_background(image_path):
@@ -87,7 +87,7 @@ def main():
     elif st.session_state.page == 'profile':
         profile.show()
 
-    # Logout in sidebar (optional backup)
+    # Sidebar logout option
     if st.session_state.logged_in:
         if st.sidebar.button("Logout"):
             st.session_state.logged_in = False
