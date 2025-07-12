@@ -1,6 +1,5 @@
 import streamlit as st
 import sys, os
-import time
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from auth import save_user, username_exists
@@ -8,7 +7,6 @@ from auth import save_user, username_exists
 def show():
     st.header("📝 User Registration")
 
-    # Main form
     with st.form("user_registration_form"):
         username = st.text_input("Choose a Username *")
         password = st.text_input("Choose a Password *", type="password")
@@ -29,14 +27,21 @@ def show():
                 save_user(user_data)
                 st.success(f"User '{username}' registered successfully as {role}.")
                 st.balloons()
-                time.sleep(2)
-                st.session_state.page = "login"
+
+                st.session_state.username = username.strip()
+                st.session_state.role = role
+                st.session_state.logged_in = True
+
+                # Redirect to role-specific profile
+                if role == "driver":
+                    st.session_state.page = "register_driver"  # go fill driver profile
+                else:
+                    st.session_state.page = "route_selection"
                 st.rerun()
 
-    # These buttons are shown always, even before success
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🔐 Go to Login"):
+        if st.button("🔐 Already a user? Login"):
             st.session_state.page = "login"
             st.rerun()
     with col2:
