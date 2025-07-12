@@ -1,86 +1,131 @@
-
 import streamlit as st
+import base64
 import sys, os
+from PIL import Image
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from logic import load_drivers, load_bookings, update_driver_route
+# Import your page modules
+from screens import (
+    home,
+    login,
+    route_selection,
+    show_drivers,
+    driver_dashboard,
+    register_user,
+    driver_route_selection,  # ✅ new import
+)
+from logic import load_drivers  # ✅ for checking if driver exists
 
-def show():
-    st.header("🚗 Driver Dashboard")
+# Background image setup
+def set_background(image_path):
+    with open(image_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode()
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{encoded_string}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }}
+        .css-1d391kg {{
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            padding: 20px;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-    username = st.session_state.get("username")
-    if not username:
-        st.error("Session expired. Please log in again.")
-        st.session_state.page = "login"
-        st.rerun()
-        return
+set_background("static/images/background.png")
 
-    # Load driver profile
-    drivers = load_drivers()
-    driver = next((d for d in drivers if d.get("username") == username), None)
+st.set_page_config(
+    page_title="Smart Ride Pooling",
+    page_icon="🚗",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-    if not driver:
-        st.error("Something went wrong. Driver not found.")
-        st.session_state.page = "login"
-        st.rerun()
-        return  # ❗ This was the mistake before: you had 'return' early, so nothing below was running
+def main():
+    # Session state init
+    if 'page' not in st.session_state:
+        st.session_state.page = 'home'
+    if 'logged_in' not in st.session_state:
+        st.session_state.logged_in = False
+    if 'role' not in st.session_state:
+        st.session_state.role = None
+    if 'username' not in st.session_state:
+        st.session_state.username = None
+    if 'route_info' not in st.session_state:
+        st.session_state.route_info = None
 
-    ## 1) Show static profile info
-    st.subheader("👤 Your Profile")
-    st.write(f"**Name:** {driver.get('name', 'N/A')}")
-    st.write(f"**Contact:** {driver.get('contact', 'N/A')}")
-    st.write(f"**Vehicle No:** {driver.get('vehicle_no', 'N/A')}")
-    st.write(f"**License No:** {driver.get('license_no', 'N/A')}")
+    # Navigation logic
+    if st.session_state.page == 'home':
+        home.show()
 
-    st.markdown("---")
+    elif st.session_state.page == 'login':
+        login.show()
 
-    ## 2) Ride details form
-    st.subheader("🗺️ Update Your Next Ride")
+    elif st.session_state.page == 'register_user':
+        register_user.show()
 
-    # Parse default time if present, else use default
-    from datetime import datetime
-    default_time = driver.get("time", "09:00")
-    try:
-        parsed_time = datetime.strptime(default_time, "%H:%M").time()
-    except ValueError:
-        parsed_time = datetime.now().time()
+    elif st.session_state.page == 'route_selection':
+        route_selection.show()
 
-    with st.form("ride_form"):
-        from_loc = st.text_input("From", value=driver.get("from", ""))
-        to_loc = st.text_input("To", value=driver.get("to", ""))
-        date = st.date_input("Date", value=datetime.today().date())
-        time = st.time_input("Time", value=parsed_time)
-        submitted = st.form_submit_button("Save Ride Details")
+    elif st.session_state.page == 'driver_route_selection':
+        driver_route_selection.show()
 
-        if submitted:
-            new_route = {
-                "from": from_loc.strip(),
-                "to": to_loc.strip(),
-                "date": str(date),
-                "time": time.strftime("%H:%M")
-            }
-            if update_driver_route(username, new_route):
-                st.success("✅ Ride details updated!")
-                st.session_state.time_obj = time  # Store for future default
-            else:
-                st.error("❌ Failed to update ride. Please try again.")
+    elif st.session_state.page == 'show_drivers':
+        show_drivers.show()
 
-    st.markdown("---")
+    elif st.session_state.page == 'driver_dashboard':
+        driver_dashboard.show()
 
-    # 3) Show bookings
-    st.subheader("📋 Your Bookings")
-    bookings = load_bookings()
-    your_bookings = [b for b in bookings if b["driver"].get("username") == username]
+    # Logout logic
+    if st.session_state.logged_in:
+        if st.sidebar.button("Logout"):
+            st.session_state.logged_in = False
+            st.session_state.username = None
+            st.session_state.role = None
+            st.session_state.route_info = None
+            st.session_state.page = 'home'
+            st.rerun()
 
-    if your_bookings:
-        for b in your_bookings:
-            p = b["passenger"]
-            st.markdown(f"""
-                **👤 Passenger:** {p.get('name', 'N/A')}  
-                **📞 Contact:** {p.get('contact', 'N/A')}  
-                **🛣️ Route:** {p.get('from', 'N/A')} → {p.get('to', 'N/A')}  
-                **📅 When:** {p.get('date', 'N/A')} at {p.get('time', 'N/A')}
-                ---
-            """)
-    else:
-        st.info("ℹ️ No bookings yet.")
+    # Car animation
+    with open("static/images/car.png", "rb") as img_file:
+        img_bytes = img_file.read()
+        img_base64 = base64.b64encode(img_bytes).decode()
+        img_data_url = f"data:image/png;base64,{img_base64}"
+
+    st.markdown(f"""
+    <style>
+    .car-animation-container {{
+        position: fixed;
+        left: 0;
+        bottom: 5px;
+        width: 150vw;
+        height: 150px;
+        pointer-events: none;
+        z-index: 9999;
+    }}
+    .car-animation-img {{
+        position: absolute;
+        left: -200px;
+        bottom: 0;
+        height: 100px;
+        animation: moveCar 7s linear infinite;
+    }}
+    @keyframes moveCar {{
+        0% {{ left: -200px; }}
+        100% {{ left: 100vw; }}
+    }}
+    </style>
+    <div class="car-animation-container">
+        <img src="{img_data_url}" class="car-animation-img" alt="Car">
+    </div>
+    """, unsafe_allow_html=True)
+
+if __name__ == "__main__":
+    main()
