@@ -1,51 +1,107 @@
-import streamlit as st
-import sys, os
-from datetime import datetime
+import os
+import json
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from logic import update_driver_route, load_drivers
+# File paths
+PASSENGERS_JSON = "data/passengers.json"
+DRIVERS_JSON    = "data/drivers.json"
+BOOKINGS_JSON   = "data/bookings.json"
+USERS_JSON      = "data/users.json"
 
-def show():
-    st.header("🚗 Driver Route Setup")
+def load_json(filepath):
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, "r") as f:
+                content = f.read().strip()
+                return json.loads(content) if content else []
+        except json.JSONDecodeError:
+            return []
+    return []
 
-    username = st.session_state.get("username")
-    if not username:
-        st.warning("Please log in as a driver.")
-        st.session_state.page = "login"
-        st.rerun()
-        return
+def save_json(filepath, data):
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, "w") as f:
+        json.dump(data, f, indent=4)
 
-    # Load existing driver profile (just for confirmation, not editing here)
+# Loaders
+def load_passengers():
+    return load_json(PASSENGERS_JSON)
+
+def load_drivers():
+    return load_json(DRIVERS_JSON)
+
+def load_bookings():
+    return load_json(BOOKINGS_JSON)
+
+def load_users():
+    return load_json(USERS_JSON)
+
+# Savers
+def save_passenger(passenger_data):
+    passengers = load_passengers()
+    passengers.append(passenger_data)
+    save_json(PASSENGERS_JSON, passengers)
+
+def save_driver(driver_data):
     drivers = load_drivers()
-    driver = next((d for d in drivers if d.get("username") == username), None)
+    drivers.append(driver_data)
+    save_json(DRIVERS_JSON, drivers)
 
-    with st.form("driver_route_form"):
-        from_location = st.text_input("From Location *")
-        to_location = st.text_input("To Location *")
-        avail_date = st.date_input("Available Date *", value=datetime.today())
-        avail_time = st.time_input("Available Time *", value=datetime.now().time())
+def save_booking(booking_data):
+    bookings = load_bookings()
+    bookings.append(booking_data)
+    save_json(BOOKINGS_JSON, bookings)
 
-        submitted = st.form_submit_button("Save Route")
+def save_user(user_data):
+    users = load_users()
+    users.append(user_data)
+    save_json(USERS_JSON, users)
 
-        if submitted:
-            required_fields = [from_location, to_location]
-            if any(not str(field).strip() for field in required_fields):
-                st.error("Please fill all required fields marked with *.")
-            else:
-                new_route = {
-                    "from": from_location.strip(),
-                    "to": to_location.strip(),
-                    "date": str(avail_date),
-                    "time": avail_time.strftime("%H:%M:%S")
-                }
-                if update_driver_route(username, new_route):
-                    st.success("Driver route updated successfully!")
-                    st.session_state.route_info = new_route
-                    st.session_state.page = "driver_dashboard"
-                    st.rerun()
-                else:
-                    st.error("Failed to update route. Please try again.")
+def username_exists(username):
+    users = load_users()
+    return any(user["username"] == username for user in users)
 
-    if st.button("🏠 Back to Home"):
-        st.session_state.page = "home"
-        st.rerun()
+# Matching driver with passenger route
+def find_matches(route_info):
+    drivers = load_drivers()
+    matches = [
+        d for d in drivers
+        if d.get('from', '').strip().lower() == route_info['from'].strip().lower()
+        and d.get('to',   '').strip().lower() == route_info['to'].strip().lower()
+        and d.get('date') == route_info['date']
+    ]
+    return matches
+
+# Update driver's route (upsert)
+def update_driver_route(username, new_route):
+    """
+    Upsert a driver's route:
+     - If a driver with this username exists, update their route.
+     - Otherwise, append a new minimal record with username + route.
+    """
+    drivers = load_drivers()
+    updated = False
+
+    for d in drivers:
+        if d.get("username") == username:
+            # Update existing record
+            d["from"] = new_route["from"]
+            d["to"]   = new_route["to"]
+            d["date"] = new_route["date"]
+            d["time"] = new_route["time"]
+            updated = True
+            break
+
+    if not updated:
+        # No existing profile found: create minimal one
+        drivers.append({
+            "username": username,
+            "from":     new_route["from"],
+            "to":       new_route["to"],
+            "date":     new_route["date"],
+            "time":     new_route["time"]
+        })
+        updated = True
+
+    if updated:
+        save_json(DRIVERS_JSON, drivers)
+    return updated
