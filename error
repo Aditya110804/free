@@ -1,33 +1,15 @@
-def update_driver_route(username, new_route):
-    """
-    Upsert a driver's route:
-    - If driver exists in drivers.json (by username), update their route
-    - Else, fallback to create new minimal route record
-    """
-    drivers = load_drivers()
-    updated = False
+KeyError: 'name'
 
-    for d in drivers:
-        if d.get("username") == username:
-            d["from"] = new_route["from"]
-            d["to"]   = new_route["to"]
-            d["date"] = new_route["date"]
-            d["time"] = new_route["time"]
-            updated = True
-            break
-
-    if not updated:
-        # fallback if no matching driver exists, create new one
-        drivers.append({
-            "username": username,
-            "from": new_route["from"],
-            "to": new_route["to"],
-            "date": new_route["date"],
-            "time": new_route["time"]
-        })
-        updated = True
-
-    # Save the updated list back
-    if updated:
-        save_json(DRIVERS_JSON, drivers)
-    return updated
+File "C:\Users\ADITYA\Desktop\CAR POOLING\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 128, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+File "C:\Users\ADITYA\Desktop\CAR POOLING\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 669, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\ADITYA\Desktop\CAR POOLING\app.py", line 135, in <module>
+    main()
+File "C:\Users\ADITYA\Desktop\CAR POOLING\app.py", line 84, in main
+    show_drivers.show()
+File "C:\Users\ADITYA\Desktop\CAR POOLING\screens\show_drivers.py", line 25, in show
+    with st.expander(f"Driver: {driver['name']}"):
+                                ~~~~~~^^^^^^^^
