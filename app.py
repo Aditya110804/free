@@ -12,11 +12,11 @@ from screens import (
     driver_dashboard,
     register_user,
     register_drivers,
-    driver_route_selection,
-    profile  # ✅ new screen
+    profile  # now import profile from screens
 )
+import screens.driver_route_selection as driver_route_selection  # explicit import
 from logic import load_drivers
-from navbar import render_navbar  # ✅ reusable navbar
+from navbar import render_navbar
 
 # Background image setup
 def set_background(image_path):
