@@ -3,7 +3,7 @@ import base64
 import sys, os
 from PIL import Image
 
-# Import your page modules
+# Import screen modules
 from screens import (
     home,
     login,
@@ -12,13 +12,13 @@ from screens import (
     driver_dashboard,
     register_user,
     register_drivers,
-    profile  # now import profile from screens
+    user_profile as profile  # renamed file
 )
-import screens.driver_route_selection as driver_route_selection  # explicit import
-from logic import load_drivers
+import screens.driver_route_selection as driver_route_selection  # direct import
+
 from navbar import render_navbar
 
-# Background image setup
+# Set background image
 def set_background(image_path):
     with open(image_path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode()
@@ -52,6 +52,7 @@ st.set_page_config(
 )
 
 def main():
+    # Initialize session state
     if 'page' not in st.session_state:
         st.session_state.page = 'home'
     if 'logged_in' not in st.session_state:
@@ -63,11 +64,11 @@ def main():
     if 'route_info' not in st.session_state:
         st.session_state.route_info = None
 
-    # Render navbar if logged in
+    # Show navbar only when logged in
     if st.session_state.logged_in:
         render_navbar()
 
-    # Page routing
+    # Routing logic
     if st.session_state.page == 'home':
         home.show()
     elif st.session_state.page == 'login':
@@ -87,7 +88,7 @@ def main():
     elif st.session_state.page == 'profile':
         profile.show()
 
-    # Sidebar logout option
+    # Logout
     if st.session_state.logged_in:
         if st.sidebar.button("Logout"):
             st.session_state.logged_in = False
