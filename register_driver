@@ -1,3 +1,4 @@
+# screens/register_drivers.py
 import streamlit as st
 import sys, os
 
@@ -15,29 +16,30 @@ def show():
         return
 
     with st.form("driver_profile_form"):
-        name = st.text_input("Full Name *")
-        age = st.number_input("Age *", min_value=18, max_value=100)
-        gender = st.selectbox("Gender *", ["Male", "Female", "Other"])
-        contact = st.text_input("Contact Number *")
+        name       = st.text_input("Full Name *")
+        age        = st.number_input("Age *", min_value=18, max_value=100)
+        gender     = st.selectbox("Gender *", ["Male", "Female", "Other"])
+        contact    = st.text_input("Contact Number *")
         vehicle_no = st.text_input("Vehicle Number *")
-        driver_id = st.text_input("Driver ID *")
-        national_id = st.text_input("National ID / Aadhaar *")
+        driver_id  = st.text_input("Driver ID *")
+        national_id= st.text_input("National ID / Aadhaar *")
 
         submitted = st.form_submit_button("Save Profile")
-
         if submitted:
-            required_fields = [name, contact, vehicle_no, driver_id, national_id]
-            if any(not str(field).strip() for field in required_fields):
+            # Validate inputs
+            fields = [name, contact, vehicle_no, driver_id, national_id]
+            if any(not str(f).strip() for f in fields):
                 st.error("Please fill in all required fields.")
             else:
+                # Build driver data with username
                 driver_data = {
                     "username": username,
-                    "name": name.strip(),
-                    "age": int(age),
-                    "gender": gender,
-                    "contact": contact.strip(),
+                    "name":     name.strip(),
+                    "age":      int(age),
+                    "gender":   gender,
+                    "contact":  contact.strip(),
                     "vehicle_no": vehicle_no.strip(),
-                    "driver_id": driver_id.strip(),
+                    "driver_id":  driver_id.strip(),
                     "national_id": national_id.strip()
                 }
                 save_driver(driver_data)
