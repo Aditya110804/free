@@ -10,6 +10,6 @@ File "C:\Users\ADITYA\Desktop\CAR POOLING\app.py", line 135, in <module>
     main()
 File "C:\Users\ADITYA\Desktop\CAR POOLING\app.py", line 84, in main
     show_drivers.show()
-File "C:\Users\ADITYA\Desktop\CAR POOLING\screens\show_drivers.py", line 25, in show
-    with st.expander(f"Driver: {driver['name']}"):
-                                ~~~~~~^^^^^^^^
+File "C:\Users\ADITYA\Desktop\CAR POOLING\screens\show_drivers.py", line 42, in show
+    st.success(f"Ride booked with {driver['name']}! The driver will contact you soon.")
+                                   ~~~~~~^^^^^^^^
