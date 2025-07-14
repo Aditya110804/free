@@ -1,15 +1,520 @@
-KeyError: 'name'
+import streamlit as st
 
-File "C:\Users\ADITYA\Desktop\CAR POOLING\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 128, in exec_func_with_error_handling
-    result = func()
-             ^^^^^^
-File "C:\Users\ADITYA\Desktop\CAR POOLING\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 669, in code_to_exec
-    exec(code, module.__dict__)  # noqa: S102
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-File "C:\Users\ADITYA\Desktop\CAR POOLING\app.py", line 135, in <module>
-    main()
-File "C:\Users\ADITYA\Desktop\CAR POOLING\app.py", line 84, in main
-    show_drivers.show()
-File "C:\Users\ADITYA\Desktop\CAR POOLING\screens\show_drivers.py", line 42, in show
-    st.success(f"Ride booked with {driver['name']}! The driver will contact you soon.")
-                                   ~~~~~~^^^^^^^^
+def show():
+    # Handle navigation via query params
+    query_params = st.query_params
+    if "action" in query_params:
+        if query_params["action"] == "login":
+            st.session_state.page = "login"
+            st.rerun()
+        elif query_params["action"] == "register":
+            st.session_state.page = "register_user"
+            st.rerun()
+
+    # Enhanced CSS for better visual appeal with sky blue background
+    st.markdown("""
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .main-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3.8rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            letter-spacing: -1px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .car-icon {
+            font-size: 3.5rem;
+            margin-right: 1rem;
+            display: inline-block;
+            animation: bounce 2s infinite;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+     
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            margin: 1rem 0;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: transform 0.6s;
+            transform: rotate(45deg) translate(-100%, -100%);
+        }
+        
+        .feature-card:hover::before {
+            transform: rotate(45deg) translate(100%, 100%);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-title {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-desc {
+            color: #5a6c7d;
+            font-size: 1.1rem;
+            text-align: center;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 4rem 2rem;
+            border-radius: 30px;
+            margin: 4rem 0;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .cta-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 2rem 1rem;
+            min-width: 150px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #5a6c7d;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        
+        .moving-cars {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .car {
+            position: absolute;
+            bottom: 30px;
+            font-size: 2.8rem;
+            animation: moveCar 20s linear infinite;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        .car1 {
+            left: -150px;
+            animation-delay: 0s;
+        }
+        .car2 {
+            left: -150px;
+            animation-delay: 7s;
+        }
+        .car3 {
+            left: -150px;
+            animation-delay: 14s;
+        }
+        
+        @keyframes moveCar {
+            0% { transform: translateX(-150px); }
+            100% { transform: translateX(calc(100vw + 150px)); }
+        }
+        
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+        }
+        
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            animation: float 8s ease-in-out infinite;
+            backdrop-filter: blur(5px);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+        
+        .custom-top-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            text-decoration: none;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            text-align: center;
+            margin: 0 0.8rem;
+            min-width: 220px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .custom-top-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .custom-top-btn:hover::before {
+            left: 100%;
+        }
+        
+        .custom-top-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+            color: #fff !important;
+            text-decoration: none;
+        }
+        
+        .hero-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 30px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .process-step {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            margin: 1rem 0;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .process-step:hover {
+            transform: translateY(-5px);
+        }
+        
+        .process-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+        
+        .process-title {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .process-desc {
+            color: #5a6c7d;
+            font-size: 1rem;
+            line-height: 1.5;
+            max-width: 200px;
+            text-align: center;
+        }
+        
+        .footer-section {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            margin-top: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .footer-text {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-subtext {
+            color: #5a6c7d;
+            font-size: 0.95rem;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Floating background elements
+    st.markdown("""
+        <div class="floating-elements">
+            <div class="floating-circle circle1"></div>
+            <div class="floating-circle circle2"></div>
+            <div class="floating-circle circle3"></div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Hero Section with improved car icon
+    st.markdown("""
+        <div class="hero-section">
+            <div class="title-container">
+                <span class="car-icon">🚗</span>
+                <h1 class="main-header">Smart Ride Pooling</h1>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Login/Register Buttons
+    
+    st.markdown("""
+        <div style="display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 4rem; flex-wrap: wrap;">
+            <a href="/?action=login" class="custom-top-btn">
+                <span style="font-size:1.2rem; vertical-align:middle; margin-right:0.5rem;">🔐</span>
+                <span style="vertical-align:middle;">Login</span>
+            </a>
+            <a href="/?action=register" class="custom-top-btn">
+                <span style="font-size:1.2rem; vertical-align:middle; margin-right:0.5rem;">📝</span>
+                <span style="vertical-align:middle;">Register</span>
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Enhanced Statistics Section
+    st.markdown("""
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-number">10K+</span>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">50K+</span>
+                <div class="stat-label">Rides Shared</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">₹2L+</span>
+                <div class="stat-label">Money Saved</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">1000+</span>
+                <div class="stat-label">CO₂ Reduced</div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Features Section
+    st.markdown("### ✨ Why Choose Smart Ride Pooling?")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("""
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <div class="feature-title">Save Money</div>
+                <div class="feature-desc">Split fuel costs and reduce your travel expenses by up to 70%</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown("""
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <div class="feature-title">Go Green</div>
+                <div class="feature-desc">Reduce carbon footprint and contribute to a cleaner environment</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown("""
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <div class="feature-title">Meet People</div>
+                <div class="feature-desc">Connect with like-minded travelers and build new friendships</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+    # Call to Action Section
+    st.markdown("""
+        <div class="cta-section">
+            <h2 class="cta-title">Ready to Start Your Journey?</h2>
+            <p class="cta-subtitle">Join thousands of smart travelers who are already saving money and helping the environment</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # How It Works Section
+    st.markdown("---")
+    st.markdown("### 🚀 How It Works")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("""
+            <div class="process-step">
+                <div class="process-icon">📱</div>
+                <h4 class="process-title">1. Sign Up</h4>
+                <p class="process-desc">Create your account in just 2 minutes</p>
+            </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown("""
+            <div class="process-step">
+                <div class="process-icon">🔍</div>
+                <h4 class="process-title">2. Find Rides</h4>
+                <p class="process-desc">Search for rides or offer your own</p>
+            </div>
+        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown("""
+            <div class="process-step">
+                <div class="process-icon">🚗</div>
+                <h4 class="process-title">3. Travel Smart</h4>
+                <p class="process-desc">Enjoy your ride and save money</p>
+            </div>
+        """, unsafe_allow_html=True)
+
+    # Footer
+    st.markdown("---")
+    st.markdown("""
+        <div class="footer-section">
+            <p class="footer-text">🌟 Join the movement towards sustainable transportation 🌟</p>
+            <p class="footer-subtext">Made with ❤️ for a greener future</p>
+        </div>
+    """, unsafe_allow_html=True)
